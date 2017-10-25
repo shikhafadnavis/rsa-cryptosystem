@@ -49,10 +49,11 @@ func squareAndMultiply(num int, exp int64) int{
 
 }
 
-func millerRabinPrime(num float64){
+func millerRabinPrime(num float64) bool{
 
 	var a, k, res, prevRes float64
 	var b, nextb int64
+	var result bool = false
 	a = num - 1
 	k = 1
 	for true{
@@ -66,31 +67,39 @@ func millerRabinPrime(num float64){
 	}
 
 	fmt.Printf("the two numbers are %f and %f", prevRes, k-1)
+
 	b = int64(math.Exp2(prevRes)) % int64(num)
+	fmt.Printf("\nvalue is: %d", b)
 	if b == 1{
-		fmt.Println("Composite")
-		//return false
+		//fmt.Println("Composite")
+		result =  false
+		return result
 	}else if b == -1{
-		fmt.Println("Prime")
-		//return true
+		//fmt.Println("Prime")
+		result =  true
+		return result
 	}
 
-	for true{
+	for i := 0; i < int(k-1); i++{
 		nextb = (b*b) % int64(num)
-		if b == 1{
-                	fmt.Println("Composite")
+		fmt.Printf("\nValue is: %d", nextb)
+		if nextb == int64(num - 1){
+			result = true
 			break
-                	//return false
-        	}else if b == -1{
-                	fmt.Println("Prime")
+		}
+		if nextb == 1{
+			result = false
 			break
-                	//return true
+        	}else if nextb == -1{
+                	result = true
+			break
         	}
 
 		b = nextb
 
 	}
-
+	
+	return result
 
 }
 
@@ -99,7 +108,12 @@ func main(){
 	expRes := squareAndMultiply(2,1)
 	fmt.Println(expRes)
 	//fmt.Printf("%d raised to the power of %d is: %d",expRes,)
-	millerRabinPrime(561)
+	primeRes := millerRabinPrime(11)
+	if primeRes == true{
+		fmt.Println("\n Prime number")
+	}else{
+		fmt.Println("\n Composite Number")
+	}
 }
 
 
