@@ -11,12 +11,9 @@ package main
 import(
 	"fmt"
 //	"crypto/rand"
-//	"strings"
-//	"strconv"
-//	"reflect"
-//	"math"
 	"math/big"
-//	"math/rand"
+//	"io"
+	"math/rand"
 )
 
 
@@ -55,20 +52,60 @@ func squareAndMultiply(num *big.Int, exp *big.Int) (*big.Int){
 
 }
 
+func millerTest(num *big.Int, factor *big.Int, pow *big.Int) bool{
+
+
+	b := big.NewInt(0)
+	mulRes := big.NewInt(0)
+	nextb := big.NewInt(0)
+	var i *big.Int
+
+
+	randomNum1 := rand.Int63n((big.NewInt(0).Sub(num,big.NewInt(4))).Int64()) + 2
+	fmt.Printf("\n Random Number chosen is: %d", randomNum1)
+	//Change this to crypto/rand
+	randomNum := big.NewInt(randomNum1)
+	b.Mod(squareAndMultiply(randomNum, factor), num)
+	fmt.Println("\nValue of b0 is: ", b)
+	if b.Cmp(big.NewInt(1)) == 0 || b.Cmp(big.NewInt(0).Sub(num,big.NewInt(1))) == 0{
+	
+		return true
+	}
+
+	for i = big.NewInt(0); i.Cmp(pow) == -1; i.Add(i,big.NewInt(1)){
+        	mulRes.Mul(b,b)
+		nextb.Mod(mulRes, num)
+                fmt.Println("\nValue is: ", nextb)
+                if nextb.Cmp(big.NewInt(1)) == 0{
+			
+			return false
+		}
+		if nextb.Cmp(big.NewInt(0).Sub(num,big.NewInt(1))) == 0{
+			
+			return true
+		}
+
+                b = big.NewInt(nextb.Int64())
+
+        }// end of squaring for
+ 
+				
+
+	return false	
+
+}
+
 func millerRabinPrime(num *big.Int) bool{
 
 	var prevRes, factor *big.Int //float64
-	var i *big.Int //int64
-	var result bool = true
+	
+
 	a := big.NewInt(0)	
 	a.Sub(num,big.NewInt(1))
 	fmt.Println("Num minus 1 is: ", a)
 	k := big.NewInt(1)
 	res := big.NewInt(0)
 	modulus := big.NewInt(0)
-	b := big.NewInt(0)
-	mulRes := big.NewInt(0)
-	nextb := big.NewInt(0)
 	for true{
 		prevRes = big.NewInt(res.Int64())
 		div := squareAndMultiply(big.NewInt(2), k)
@@ -92,58 +129,38 @@ func millerRabinPrime(num *big.Int) bool{
 
 	for j := 0; j < 5; j++{
 	
-		//randomNum := rand.Int63n(int64(num-4)) + 2
-		//fmt.Printf("\n Random Number chosen is: %d", randomNum)
-		randomNum := big.NewInt(2)
-		b.Mod(squareAndMultiply(randomNum, factor), num)
-		//b = int64(squareAndMultiply(int(randomNum), int64(factor))) % int64(num)
-		//b = int64(math.Exp2(factor)) % int64(num)
-		fmt.Println("\nValue of b0 is: ", b)
-		if b.Cmp(big.NewInt(1)) == 0 || b.Cmp(big.NewInt(0).Sub(num,big.NewInt(1))) == 0{
-			result = true
-			return result
+		//Call miller test
+		if millerTest(num, factor, pow) == false{
+			return false
 		}
-
-		for i = big.NewInt(0); i.Cmp(pow) == -1; i.Add(i,big.NewInt(1)){
-                        //nextb = (b*b) % int64(num)
-			mulRes.Mul(b,b)
-			nextb.Mod(mulRes, num)
-                       	fmt.Println("\nValue is: ", nextb)
-                       	if nextb.Cmp(big.NewInt(1)) == 0{
-				result = false
-				return result
-			}
-			if nextb.Cmp(big.NewInt(0).Sub(num,big.NewInt(1))) == 0{
-				result = true
-				return result
-			}
-
-                       	b = big.NewInt(nextb.Int64())
-
-                }// end of squaring for
- 
-				
-
-		result = false
-		return result	
 	
 	}// end of randomnums for
 
-	result = true
-	return result
+	return true
 
 } // end of func
 
 func main(){
-
-	//expRes := squareAndMultiply(2,1)
-	//fmt.Println(expRes)
-	//fmt.Printf("%d raised to the power of %d is: %d",expRes,)
-	primeRes := millerRabinPrime(big.NewInt(1223))
-	if primeRes == true{
-		fmt.Println("\n Prime number")
+/*	var Reader io.Reader
+	randNum, err := rand.Int(Reader, big.NewInt(20000))
+	if err != nil{
+		panic(err)
+	}
+*/
+	randNum := big.NewInt(224737)
+	operation := big.NewInt(0)
+	operation.Mod(randNum, big.NewInt(2))
+	if operation.Cmp(big.NewInt(0)) == 0{
+		fmt.Println("Composite Number")
+		//generate random again
 	}else{
-		fmt.Println("\n Composite Number")
+		primeRes := millerRabinPrime(randNum)
+		if primeRes == true{
+			fmt.Println("\n Prime number")
+		}else{
+			fmt.Println("\n Composite Number")
+		}
+
 	}
 }
 
