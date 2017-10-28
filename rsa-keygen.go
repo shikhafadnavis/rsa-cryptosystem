@@ -31,7 +31,7 @@ func squareAndMultiply(num *big.Int, exp *big.Int) (*big.Int){
 	//fmt.Println(len(binExp))
 	//Start square and multiply
 	binExp := fmt.Sprintf("%b", exp)
-	res = num
+	res = big.NewInt(num.Int64())
 	if exp == big.NewInt(1){
 		return num
 	}
@@ -57,25 +57,35 @@ func squareAndMultiply(num *big.Int, exp *big.Int) (*big.Int){
 
 func millerRabinPrime(num *big.Int) bool{
 
-	var a, k, res, prevRes, factor, pow, modulus, mulRes *big.Int //float64
-	var b, nextb, i *big.Int //int64
+	var prevRes, factor *big.Int //float64
+	var i *big.Int //int64
 	var result bool = true
-	
+	a := big.NewInt(0)	
 	a.Sub(num,big.NewInt(1))
 	fmt.Println("Num minus 1 is: ", a)
-	k = big.NewInt(1)
+	k := big.NewInt(1)
+	res := big.NewInt(0)
+	modulus := big.NewInt(0)
+	b := big.NewInt(0)
+	mulRes := big.NewInt(0)
+	nextb := big.NewInt(0)
 	for true{
-		prevRes = res
+		prevRes = big.NewInt(res.Int64())
 		div := squareAndMultiply(big.NewInt(2), k)
 		res.Div(a,div)
-		if modulus.Mod(a,div) == big.NewInt(0){
+		fmt.Println("resulting number is: ", res)
+		fmt.Println("resulting remainder is: ", modulus.Mod(a,div))
+		modulus.Mod(a,div)
+		if modulus.Cmp(big.NewInt(0)) == 0{
 			k.Add(k,big.NewInt(1))
+			fmt.Println("k is now; ", k)
 		}else{
 			break
 		}
 	}
 
-	factor = prevRes
+	factor = big.NewInt(prevRes.Int64())
+	pow := big.NewInt(0)
 	pow.Sub(k,big.NewInt(1))
 
 	fmt.Println("the two numbers are: ", factor, pow)
@@ -89,7 +99,7 @@ func millerRabinPrime(num *big.Int) bool{
 		//b = int64(squareAndMultiply(int(randomNum), int64(factor))) % int64(num)
 		//b = int64(math.Exp2(factor)) % int64(num)
 		fmt.Println("\nValue of b0 is: ", b)
-		if b == big.NewInt(1) || b == big.NewInt(0).Sub(num,big.NewInt(1)){
+		if b.Cmp(big.NewInt(1)) == 0 || b.Cmp(big.NewInt(0).Sub(num,big.NewInt(1))) == 0{
 			result = true
 			return result
 		}
@@ -99,16 +109,16 @@ func millerRabinPrime(num *big.Int) bool{
 			mulRes.Mul(b,b)
 			nextb.Mod(mulRes, num)
                        	fmt.Println("\nValue is: ", nextb)
-                       	if nextb == big.NewInt(1){
+                       	if nextb.Cmp(big.NewInt(1)) == 0{
 				result = false
 				return result
 			}
-			if nextb == big.NewInt(0).Sub(num,big.NewInt(1)){
+			if nextb.Cmp(big.NewInt(0).Sub(num,big.NewInt(1))) == 0{
 				result = true
 				return result
 			}
 
-                       	b = nextb
+                       	b = big.NewInt(nextb.Int64())
 
                 }// end of squaring for
  
@@ -129,7 +139,7 @@ func main(){
 	//expRes := squareAndMultiply(2,1)
 	//fmt.Println(expRes)
 	//fmt.Printf("%d raised to the power of %d is: %d",expRes,)
-	primeRes := millerRabinPrime(big.NewInt(85))
+	primeRes := millerRabinPrime(big.NewInt(1223))
 	if primeRes == true{
 		fmt.Println("\n Prime number")
 	}else{
