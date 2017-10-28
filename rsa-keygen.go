@@ -13,8 +13,9 @@ import(
 //	"crypto/rand"
 //	"strings"
 	"strconv"
-	"reflect"
+//	"reflect"
 	"math"
+	"math/rand"
 )
 
 
@@ -22,10 +23,10 @@ func squareAndMultiply(num int, exp int64) int{
 
 	var i, res int
 	binExp := strconv.FormatInt(exp,2)
-	fmt.Println(binExp)
+	//fmt.Println(binExp)
 
-	fmt.Println(reflect.TypeOf(binExp))
-	fmt.Println(len(binExp))
+	//fmt.Println(reflect.TypeOf(binExp))
+	//fmt.Println(len(binExp))
 	//Start square and multiply
 	
 	res = num
@@ -51,9 +52,9 @@ func squareAndMultiply(num int, exp int64) int{
 
 func millerRabinPrime(num float64) bool{
 
-	var a, k, res, prevRes float64
+	var a, k, res, prevRes, factor, pow float64
 	var b, nextb int64
-	var result bool = false
+	var result bool = true
 	a = num - 1
 	k = 1
 	for true{
@@ -66,49 +67,58 @@ func millerRabinPrime(num float64) bool{
 		}
 	}
 
-	fmt.Printf("the two numbers are %f and %f", prevRes, k-1)
+	factor = prevRes
+	pow = k-1
 
-	b = int64(math.Exp2(prevRes)) % int64(num)
-	fmt.Printf("\nvalue is: %d", b)
-	if b == 1{
-		//fmt.Println("Composite")
-		result =  false
-		return result
-	}else if b == -1{
-		//fmt.Println("Prime")
-		result =  true
-		return result
-	}
+	fmt.Printf("the two numbers are %f and %f", factor, pow)
 
-	for i := 0; i < int(k-1); i++{
-		nextb = (b*b) % int64(num)
-		fmt.Printf("\nValue is: %d", nextb)
-		if nextb == int64(num - 1){
-			result = true
-			break
-		}
-		if nextb == 1{
-			result = false
-			break
-        	}else if nextb == -1{
-                	result = true
-			break
-        	}
-
-		b = nextb
-
-	}
+	for j := 0; j < 5; j++{
 	
+		randomNum := rand.Int63n(int64(num-4)) + 2
+		fmt.Printf("\n Random Number chosen is: %d", randomNum)
+		//randomNum := 2
+		b = int64(squareAndMultiply(int(randomNum), int64(factor))) % int64(num)
+		//b = int64(math.Exp2(factor)) % int64(num)
+		fmt.Println("\nValue of b0 is: ", b)
+		if b == 1 || b == int64(num-1){
+			result = true
+			return result
+		}
+		//fmt.Println("Composite")
+		for i := 0; i < int(k-1); i++{
+                        nextb = (b*b) % int64(num)
+                       	fmt.Println("\nValue is: ", nextb)
+                       	if nextb == 1{
+				result = false
+				return result
+			}
+			if nextb == int64(num-1){
+				result = true
+				return result
+			}
+
+                       	b = nextb
+
+                }// end of squaring for
+ 
+				
+
+		result = false
+		return result	
+	
+	}// end of randomnums for
+
+	result = true
 	return result
 
-}
+} // end of func
 
 func main(){
 
-	expRes := squareAndMultiply(2,1)
-	fmt.Println(expRes)
+	//expRes := squareAndMultiply(2,1)
+	//fmt.Println(expRes)
 	//fmt.Printf("%d raised to the power of %d is: %d",expRes,)
-	primeRes := millerRabinPrime(11)
+	primeRes := millerRabinPrime(281)
 	if primeRes == true{
 		fmt.Println("\n Prime number")
 	}else{
