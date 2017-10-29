@@ -10,10 +10,10 @@ package main
 
 import(
 	"fmt"
-//	"crypto/rand"
+	crypt "crypto/rand"
 	"math/big"
 //	"io"
-	"math/rand"
+//	"math/rand"
 )
 
 
@@ -41,17 +41,17 @@ func squareAndMultiplyWithMod(num *big.Int, exp *big.Int, modn *big.Int) (*big.I
 			preFinalRes.Mod(res,modn)
 			res.Mul(preFinalRes,num)
 			finalRes.Mod(res,modn)
-			fmt.Println("Result so far: ", finalRes)
+//			fmt.Println("Result so far: ", finalRes)
 			
 		}else{
 			//only sq
 			res.Mul(res,res)
 			finalRes.Mod(res,num)
-			fmt.Println("Result so far: ", finalRes)
+//			fmt.Println("Result so far: ", finalRes)
 
 		}
 	}
-	fmt.Println("Returning sq and mul with mod result: ", finalRes)
+//	fmt.Println("Returning sq and mul with mod result: ", finalRes)
 	return finalRes
 
 
@@ -100,12 +100,19 @@ func millerTest(num *big.Int, factor *big.Int, pow *big.Int) bool{
 	var i *big.Int
 
 
-	randomNum1 := rand.Int63n((big.NewInt(0).Sub(num,big.NewInt(4))).Int64()) + 2
-	fmt.Printf("\n Random Number chosen is: %d", randomNum1)
+//	randomNum1 := rand.Int63n((big.NewInt(0).Sub(num,big.NewInt(4))).Int64()) + 2
+	randNumMiller := big.NewInt(0)
+	randNumByteMiller := make([]byte,64)
+        crypt.Read(randNumByteMiller)
+        fmt.Println("Random number byte array is: ", randNumByteMiller)
+        randNumMiller.SetBytes(randNumByteMiller)
+
+
+	//fmt.Printf("\n Random Number chosen is: %d", randomNum1)
 	//Change this to crypto/rand
-	randomNum := big.NewInt(randomNum1)
+	//randomNum := big.NewInt(randomNum1)
 	//b.Mod(squareAndMultiply(randomNum, factor), num)
-	b = squareAndMultiplyWithMod(randomNum, factor, num)
+	b = squareAndMultiplyWithMod(randNumMiller, factor, num)
 	fmt.Println("\nValue of b0 is: ", b)
 	if b.Cmp(big.NewInt(1)) == 0 || b.Cmp(big.NewInt(0).Sub(num,big.NewInt(1))) == 0{
 	
@@ -190,8 +197,12 @@ func main(){
 */
 	//randNum := big.NewInt(224737)
 	randNum := big.NewInt(0)
-	randNum.SetString("2760727302517",10)
-
+//	randNum.SetString("28342763623",10)
+	for true{
+	randNumByte := make([]byte,64)
+	crypt.Read(randNumByte)
+	fmt.Println("Random number byte array is: ", randNumByte)
+	randNum.SetBytes(randNumByte)
 	fmt.Println("random number chosen is: ", randNum)
 	operation := big.NewInt(0)
 	operation.Mod(randNum, big.NewInt(2))
@@ -202,9 +213,12 @@ func main(){
 		primeRes := millerRabinPrime(randNum)
 		if primeRes == true{
 			fmt.Println("\n Prime number")
+			break
 		}else{
 			fmt.Println("\n Composite Number")
 		}
+
+	}
 
 	}
 }
