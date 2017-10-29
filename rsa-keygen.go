@@ -178,11 +178,11 @@ func millerRabinPrime(num *big.Int) bool{
 
 } // end of func
 
-func main(){
 
-	//randNum := big.NewInt(224737)
+func randGenerate() *big.Int{
+	
 	randNum := big.NewInt(0)
-//	randNum.SetString("5737894193278481003132906692801828456005280097628154082002898285238645282246643593433683475946138489071845817699635707465770454796912355070188166454999529",10)
+	
 	for true{
 		randNumByte := make([]byte,64)
 		crypt.Read(randNumByte)
@@ -199,14 +199,29 @@ func main(){
 			if primeRes == true{
 				fmt.Println("\n Prime number")
 				break
-//				os.Exit(3)
 			}else{
 				fmt.Println("\n Composite Number")
 			}
-
 		}
-
 	}
+
+	return randNum
+
+}
+
+func main(){
+
+	modulus := big.NewInt(0)	
+
+//	randNum.SetString("5737894193278481003132906692801828456005280097628154082002898285238645282246643593433683475946138489071845817699635707465770454796912355070188166454999529",10)
+	prime1 := randGenerate()
+	prime2 := randGenerate()
+	
+	modulus.Mul(prime1, prime2)
+
+	fmt.Println("Prime 1 is: ", prime1)
+	fmt.Println("Prime 2 is: ", prime2)
+	fmt.Println(modulus)
 
 }
 
