@@ -211,17 +211,28 @@ func randGenerate() *big.Int{
 
 func main(){
 
-	modulus := big.NewInt(0)	
+	modulus := big.NewInt(0)
+	prime1minus := big.NewInt(0)
+	prime2minus := big.NewInt(0)	
+	phi := big.NewInt(0)
 
-//	randNum.SetString("5737894193278481003132906692801828456005280097628154082002898285238645282246643593433683475946138489071845817699635707465770454796912355070188166454999529",10)
 	prime1 := randGenerate()
 	prime2 := randGenerate()
 	
 	modulus.Mul(prime1, prime2)
 
+	prime1minus.Sub(prime1, big.NewInt(1))
+	prime2minus.Sub(prime2, big.NewInt(1))
+
+	phi.Mul(prime1minus, prime2minus)
+
 	fmt.Println("Prime 1 is: ", prime1)
 	fmt.Println("Prime 2 is: ", prime2)
-	fmt.Println(modulus)
+	fmt.Println("Public Modulus is: ", modulus)
+	fmt.Println("Phi Modulus is: ", phi)
+	
+
+	//pubExp :=
 
 }
 
