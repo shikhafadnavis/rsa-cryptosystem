@@ -17,6 +17,44 @@ import(
 )
 
 
+func squareAndMultiplyWithMod(num *big.Int, exp *big.Int, modn *big.Int) (*big.Int){
+
+	var i int 
+	var res, finalRes *big.Int
+	//binExp := strconv.FormatInt(exp,2)
+	//fmt.Println(binExp)
+
+	//fmt.Println(reflect.TypeOf(binExp))
+	//fmt.Println(len(binExp))
+	//Start square and multiply
+	binExp := fmt.Sprintf("%b", exp)
+	res = big.NewInt(num.Int64())
+	finalRes = big.NewInt(0)
+	if exp == big.NewInt(1){
+		return num
+	}
+	for i = 1; i < len(binExp); i++{
+		if binExp[i] == 49{
+			//sq and mul
+			res.Mul(res,res)
+			res.Mul(res,num)
+			finalRes.Mod(res,modn)
+			fmt.Println("Result so far: ", finalRes)
+			
+		}else{
+			//only sq
+			res.Mul(res,res)
+			finalRes.Mod(res,num)
+			fmt.Println("Result so far: ", finalRes)
+
+		}
+	}
+	fmt.Println("Returning sq and mul with mod result: ", finalRes)
+	return finalRes
+
+
+}
+
 func squareAndMultiply(num *big.Int, exp *big.Int) (*big.Int){
 
 	var i int 
@@ -35,13 +73,11 @@ func squareAndMultiply(num *big.Int, exp *big.Int) (*big.Int){
 	for i = 1; i < len(binExp); i++{
 		if binExp[i] == 49{
 			//sq and mul
-			//res = res * res
 			res.Mul(res,res)
-			//res = res * num
 			res.Mul(res,num)
+			
 		}else{
 			//only sq
-			//res = res * res
 			res.Mul(res,res)
 
 		}
@@ -51,6 +87,7 @@ func squareAndMultiply(num *big.Int, exp *big.Int) (*big.Int){
 
 
 }
+
 
 func millerTest(num *big.Int, factor *big.Int, pow *big.Int) bool{
 
@@ -65,7 +102,8 @@ func millerTest(num *big.Int, factor *big.Int, pow *big.Int) bool{
 	fmt.Printf("\n Random Number chosen is: %d", randomNum1)
 	//Change this to crypto/rand
 	randomNum := big.NewInt(randomNum1)
-	b.Mod(squareAndMultiply(randomNum, factor), num)
+	//b.Mod(squareAndMultiply(randomNum, factor), num)
+	b = squareAndMultiplyWithMod(randomNum, factor, num)
 	fmt.Println("\nValue of b0 is: ", b)
 	if b.Cmp(big.NewInt(1)) == 0 || b.Cmp(big.NewInt(0).Sub(num,big.NewInt(1))) == 0{
 	
@@ -109,6 +147,7 @@ func millerRabinPrime(num *big.Int) bool{
 	for true{
 		prevRes = big.NewInt(res.Int64())
 		div := squareAndMultiply(big.NewInt(2), k)
+		fmt.Println("Num will be divided by: ", div)
 		res.Div(a,div)
 		fmt.Println("resulting number is: ", res)
 		fmt.Println("resulting remainder is: ", modulus.Mod(a,div))
@@ -147,7 +186,11 @@ func main(){
 		panic(err)
 	}
 */
-	randNum := big.NewInt(224737)
+	//randNum := big.NewInt(224737)
+	randNum := big.NewInt(0)
+	randNum.SetString("7919",10)
+
+	fmt.Println("random number chosen is: ", randNum)
 	operation := big.NewInt(0)
 	operation.Mod(randNum, big.NewInt(2))
 	if operation.Cmp(big.NewInt(0)) == 0{
