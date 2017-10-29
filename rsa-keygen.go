@@ -279,7 +279,14 @@ func main(){
 
 	//Insert check for coprimality with phi
 
-	val1, val2, val3 := extendedEucledian(pubExp, phi)
+	pubExpDup := big.NewInt(0)
+	pubExpDup.Set(pubExp)
+	phiDup := big.NewInt(0)
+	phiDup.Set(phi)
+	val1, val2, val3 := extendedEucledian(pubExpDup, phiDup)
+
+	fmt.Println("Phi Modulus after extended euc is: ", phi)
+
 
 //	val1, val2, val3 := extendedEucledian(big.NewInt(5), big.NewInt(17))
 
@@ -287,8 +294,22 @@ func main(){
 	fmt.Println("val2 is: ", val2)
 	fmt.Println("val3 is: ", val3)
 
+	if val2.Cmp(big.NewInt(0)) == -1{
+		val2.Add(val2, phi)
+	}
+
+	fmt.Println("Private exponent is: ", val2)	
+
 	fmt.Println("PubExp*val2 = ", big.NewInt(0).Mul(pubExp, val2))
-	fmt.Println("PubExp*val3 = ", big.NewInt(0).Mul(pubExp, val3)) 
+//	fmt.Println("PubExp*val3 = ", big.NewInt(0).Mul(pubExp, val3))
+
+	pubWithVal2 := big.NewInt(0).Mul(pubExp, val2)
+	pubWithVal2.Mod(pubWithVal2, phi)
+	fmt.Println("Pub with Val2: ", pubWithVal2)
+//	pubWithVal3 := big.NewInt(0).Mul(pubExp, val3)
+//	pubWithVal3.Mod(pubWithVal3, phi)
+// 	fmt.Println("Pub with Val3: ", pubWithVal3)
+ 
 
 }
 
