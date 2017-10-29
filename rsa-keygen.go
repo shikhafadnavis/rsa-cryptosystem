@@ -20,7 +20,7 @@ import(
 func squareAndMultiplyWithMod(num *big.Int, exp *big.Int, modn *big.Int) (*big.Int){
 
 	var i int 
-	var res, finalRes *big.Int
+	var res, finalRes, preFinalRes *big.Int
 	//binExp := strconv.FormatInt(exp,2)
 	//fmt.Println(binExp)
 
@@ -30,6 +30,7 @@ func squareAndMultiplyWithMod(num *big.Int, exp *big.Int, modn *big.Int) (*big.I
 	binExp := fmt.Sprintf("%b", exp)
 	res = big.NewInt(num.Int64())
 	finalRes = big.NewInt(0)
+	preFinalRes = big.NewInt(0)
 	if exp == big.NewInt(1){
 		return num
 	}
@@ -37,7 +38,8 @@ func squareAndMultiplyWithMod(num *big.Int, exp *big.Int, modn *big.Int) (*big.I
 		if binExp[i] == 49{
 			//sq and mul
 			res.Mul(res,res)
-			res.Mul(res,num)
+			preFinalRes.Mod(res,modn)
+			res.Mul(preFinalRes,num)
 			finalRes.Mod(res,modn)
 			fmt.Println("Result so far: ", finalRes)
 			
@@ -188,7 +190,7 @@ func main(){
 */
 	//randNum := big.NewInt(224737)
 	randNum := big.NewInt(0)
-	randNum.SetString("7919",10)
+	randNum.SetString("2760727302517",10)
 
 	fmt.Println("random number chosen is: ", randNum)
 	operation := big.NewInt(0)
