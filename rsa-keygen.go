@@ -12,9 +12,8 @@ import(
 	"fmt"
 	crypt "crypto/rand"
 	"math/big"
-//	"io"
-//	"math/rand"
-//	"os"
+	"io/ioutil"
+	"os"
 )
 
 
@@ -35,9 +34,6 @@ func squareAndMultiplyWithMod(a *big.Int, a2 *big.Int, b *big.Int, c *big.Int) (
 	res = big.NewInt(0)
 	res.Mod(a2,c)
 
-	//res = big.NewInt(startVal.Int64())
-//	fmt.Println("Received Value: ", res)
-
 	for i = 1; i < len(binExp); i++{	
 		// Square regardless
 		someRes = big.NewInt(0)
@@ -52,8 +48,6 @@ func squareAndMultiplyWithMod(a *big.Int, a2 *big.Int, b *big.Int, c *big.Int) (
 
 	}
 
-
-//	fmt.Println("Returning value: ", res)
 	return res	
 		
 
@@ -66,7 +60,6 @@ func squareAndMultiply(num *big.Int, exp *big.Int) (*big.Int){
 	var res *big.Int
 	//Start square and multiply
 	binExp := fmt.Sprintf("%b", exp)
-//	res = big.NewInt(num.Int64())
 	if exp == big.NewInt(1){
 		return num
 	}
@@ -85,7 +78,6 @@ func squareAndMultiply(num *big.Int, exp *big.Int) (*big.Int){
 
 	return res
 
-
 }
 
 
@@ -94,17 +86,15 @@ func millerTest(num *big.Int, factor *big.Int, pow *big.Int) bool{
 
 	b := big.NewInt(0)
 	mulRes := big.NewInt(0)
-	//nextb := big.NewInt(0)
 	var i *big.Int
 
 	randNumMiller := big.NewInt(0)
 	randNumByteMiller := make([]byte,64)
         crypt.Read(randNumByteMiller)
-//        fmt.Println("Random number byte array is: ", randNumByteMiller)
         randNumMiller.SetBytes(randNumByteMiller)
 
 	b = squareAndMultiplyWithMod(randNumMiller, randNumMiller, factor, num)
-//	fmt.Println("\nValue of b0 is: ", b)
+
 	if b.Cmp(big.NewInt(1)) == 0 || b.Cmp(big.NewInt(0).Sub(num,big.NewInt(1))) == 0{
 	
 		return true
@@ -113,7 +103,6 @@ func millerTest(num *big.Int, factor *big.Int, pow *big.Int) bool{
 	for i = big.NewInt(0); i.Cmp(pow) == -1; i.Add(i,big.NewInt(1)){
         	mulRes.Mul(b,b)
 		b.Mod(mulRes, num)
-//                fmt.Println("\nValue is: ", b)
                 if b.Cmp(big.NewInt(1)) == 0{
 			
 			return false
@@ -122,8 +111,6 @@ func millerTest(num *big.Int, factor *big.Int, pow *big.Int) bool{
 			
 			return true
 		}
-
-//		fmt.Println("Subsequent b value is: ", b)
 
         }// end of squaring for
  
@@ -135,35 +122,27 @@ func millerTest(num *big.Int, factor *big.Int, pow *big.Int) bool{
 
 func millerRabinPrime(num *big.Int) bool{
 
-	var factor *big.Int //float64
+	var factor *big.Int 
 	
 
 	a := big.NewInt(0)	
 	a.Sub(num,big.NewInt(1))
-//	fmt.Println("Num minus 1 is: ", a)
-	k := big.NewInt(0) // Set to 1 for original
-	//res := big.NewInt(0)
+	k := big.NewInt(0) 
 	modulus := big.NewInt(0)
 	for true{
-		a.Div(a,big.NewInt(2)) // Change to ,div for original
-//		fmt.Println("resulting number is: ", a)
-//		fmt.Println("resulting remainder is: ", modulus.Mod(a,big.NewInt(2)))
+		a.Div(a,big.NewInt(2)) 
 		modulus.Mod(a,big.NewInt(2))
 		if modulus.Cmp(big.NewInt(0)) == 0{
 			k.Add(k,big.NewInt(1))
-//			fmt.Println("k is now; ", k)
 		}else{
 			break
 		}
 	}
 
-	//factor = big.NewInt(prevRes.Int64())
 	factor = big.NewInt(0)
 	factor.Mul(a,big.NewInt(2))
 	pow := big.NewInt(0)
-	pow.Sub(k,big.NewInt(0)) // Set to 1 for original
-
-//	fmt.Println("the two numbers are: ", factor, pow)
+	pow.Sub(k,big.NewInt(0)) 
 
 	for j := 0; j < 5; j++{
 	
@@ -186,7 +165,6 @@ func randGenerate() *big.Int{
 	for true{
 		randNumByte := make([]byte,64)
 		crypt.Read(randNumByte)
-//		fmt.Println("Random number byte array is: ", randNumByte)
 		randNum.SetBytes(randNumByte)
 		fmt.Println("random number chosen is: ", randNum)
 		operation := big.NewInt(0)
@@ -251,12 +229,47 @@ func extendedEucledian(a *big.Int, b *big.Int) (*big.Int, *big.Int, *big.Int){
 	return d,x,y
 }
 
+
+
+
+
+func writePubKey(N *big.Int, e *big.Int, filename string){
+	NStr := N.String()
+	comma := ","
+	eStr := e.String()
+	eFileStr := NStr + comma + eStr
+	eFileByte := []byte(eFileStr)
+	writeErr := ioutil.WriteFile(filename,eFileByte, 0644)
+	if writeErr != nil{
+		panic(writeErr)
+	}	
+}
+
+func writePrivKey(N *big.Int, d *big.Int, p *big.Int, q *big.Int, filename string){
+	NStr := N.String()
+	comma := ","
+	dStr := d.String()
+	pStr := p.String()
+	qStr := q.String()
+
+	dFileStr := NStr + comma + dStr + comma + pStr + comma + qStr
+	dFileByte := []byte(dFileStr)
+	writeErr := ioutil.WriteFile(filename, dFileByte, 0644)
+	if writeErr != nil{
+		panic(writeErr)
+	}	
+	
+
+
+}
+
 func main(){
 
 	modulus := big.NewInt(0)
 	prime1minus := big.NewInt(0)
 	prime2minus := big.NewInt(0)	
 	phi := big.NewInt(0)
+	privExp := big.NewInt(0)
 
 	prime1 := randGenerate()
 	prime2 := randGenerate()
@@ -287,9 +300,6 @@ func main(){
 
 	fmt.Println("Phi Modulus after extended euc is: ", phi)
 
-
-//	val1, val2, val3 := extendedEucledian(big.NewInt(5), big.NewInt(17))
-
 	fmt.Println("val1 is: ", val1)
 	fmt.Println("val2 is: ", val2)
 	fmt.Println("val3 is: ", val3)
@@ -298,18 +308,22 @@ func main(){
 		val2.Add(val2, phi)
 	}
 
-	fmt.Println("Private exponent is: ", val2)	
+	fmt.Println("Private exponent is: ", val2)
+	privExp.Set(val2)	
 
 	fmt.Println("PubExp*val2 = ", big.NewInt(0).Mul(pubExp, val2))
-//	fmt.Println("PubExp*val3 = ", big.NewInt(0).Mul(pubExp, val3))
 
 	pubWithVal2 := big.NewInt(0).Mul(pubExp, val2)
 	pubWithVal2.Mod(pubWithVal2, phi)
 	fmt.Println("Pub with Val2: ", pubWithVal2)
-//	pubWithVal3 := big.NewInt(0).Mul(pubExp, val3)
-//	pubWithVal3.Mod(pubWithVal3, phi)
-// 	fmt.Println("Pub with Val3: ", pubWithVal3)
- 
+
+	// File operations
+	
+	writePubKey(modulus, pubExp, os.Args[1])
+
+	writePrivKey(modulus, privExp, prime1, prime2, os.Args[2])
+
+	
 
 }
 
