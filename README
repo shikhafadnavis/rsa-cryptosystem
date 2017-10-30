@@ -1,1 +1,41 @@
 This project implements RSA cryptosystem in the Go language.
+
+It contains three files:
+
+============================================================================================== 
+1. rsa-keygen.go
+Sample run:
+./rsa-keygen publicKey.txt privKey.txt
+
+This file generates Public and Private key pair for RSA Cryptosystem and writes 
+onto the respective files.
+Format of public key : N,e
+Format of private key : N,d,p,q 
+
+==============================================================================================
+2. rsa-encrypt.go
+Sample Run:
+./rsa-encrypt publicKey.txt 223434534456586704545682734825348481
+
+This file takes the public key file as an argument and the plaintext to be 
+encrypted in decimal format. Outputs the ciphertext on the terminal
+
+==============================================================================================
+3. rsa-decrypt.go
+Sample Run:
+./rsa-decrypt privKey.txt 1201696421463438723652877912249377474682450968493501018231736
+28113743938444733945600723166904913368908697235075653053672978493785896149080866985825
+7776857641125745957627470186020342616934305746356854478319509975115455344060408152228
+73501453285195882129506469568844043721763746532367862697444730910524844049810
+
+This file takes the private key file as an argument and the ciphertext to be 
+decrypted in decimal format. Outputs the plaintext on the terminal
+
+==============================================================================================
+
+
+Go packages used:
+math/big
+crypto/rand
+strings
+
