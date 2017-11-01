@@ -166,19 +166,19 @@ func randGenerate() *big.Int{
 		randNumByte := make([]byte,64)
 		crypt.Read(randNumByte)
 		randNum.SetBytes(randNumByte)
-		fmt.Println("random number chosen is: ", randNum)
+//		fmt.Println("random number chosen is: ", randNum)
 		operation := big.NewInt(0)
 		operation.Mod(randNum, big.NewInt(2))
 		if operation.Cmp(big.NewInt(0)) == 0{
-			fmt.Println("Composite Number")
+//			fmt.Println("Composite Number")
 			//generate random again
 		}else{
 			primeRes := millerRabinPrime(randNum)
 			if primeRes == true{
-				fmt.Println("\n Prime number")
+//				fmt.Println("\n Prime number")
 				break
 			}else{
-				fmt.Println("\n Composite Number")
+//				fmt.Println("\n Composite Number")
 			}
 		}
 	}
@@ -235,9 +235,11 @@ func extendedEucledian(a *big.Int, b *big.Int) (*big.Int, *big.Int, *big.Int){
 
 func writePubKey(N *big.Int, e *big.Int, filename string){
 	NStr := N.String()
+	openBracket := "("
+	closeBracket := ")"
 	comma := ","
 	eStr := e.String()
-	eFileStr := NStr + comma + eStr
+	eFileStr := openBracket + NStr + comma + eStr + closeBracket
 	eFileByte := []byte(eFileStr)
 	writeErr := ioutil.WriteFile(filename,eFileByte, 0644)
 	if writeErr != nil{
@@ -247,12 +249,14 @@ func writePubKey(N *big.Int, e *big.Int, filename string){
 
 func writePrivKey(N *big.Int, d *big.Int, p *big.Int, q *big.Int, filename string){
 	NStr := N.String()
+	openBracket := "("
+        closeBracket := ")"
 	comma := ","
 	dStr := d.String()
 	pStr := p.String()
 	qStr := q.String()
 
-	dFileStr := NStr + comma + dStr + comma + pStr + comma + qStr
+	dFileStr := openBracket + NStr + comma + dStr + comma + pStr + comma + qStr + closeBracket
 	dFileByte := []byte(dFileStr)
 	writeErr := ioutil.WriteFile(filename, dFileByte, 0644)
 	if writeErr != nil{
@@ -271,24 +275,29 @@ func main(){
 	phi := big.NewInt(0)
 	privExp := big.NewInt(0)
 
+	// Generate "p" and "q"
 	prime1 := randGenerate()
 	prime2 := randGenerate()
+
 	
+	// Calculate "N"	
 	modulus.Mul(prime1, prime2)
 
+	// Calculate "phi" 
 	prime1minus.Sub(prime1, big.NewInt(1))
 	prime2minus.Sub(prime2, big.NewInt(1))
-
 	phi.Mul(prime1minus, prime2minus)
 
-	pubExp := randGenerate()
 
+	// Generate "e"
+	pubExp := randGenerate()
+/*
 	fmt.Println("Prime 1 is: ", prime1)
         fmt.Println("Prime 2 is: ", prime2)
         fmt.Println("Public Modulus is: ", modulus)
         fmt.Println("Phi Modulus is: ", phi)
-
 	fmt.Println("Public Exponent is: ", pubExp)
+*/
 
 	//Insert check for coprimality with phi
 
@@ -296,28 +305,24 @@ func main(){
 	pubExpDup.Set(pubExp)
 	phiDup := big.NewInt(0)
 	phiDup.Set(phi)
-	val1, val2, val3 := extendedEucledian(pubExpDup, phiDup)
 
-	fmt.Println("Phi Modulus after extended euc is: ", phi)
-
-	fmt.Println("val1 is: ", val1)
-	fmt.Println("val2 is: ", val2)
-	fmt.Println("val3 is: ", val3)
+	// Calculate "d" using extended eucledian theorem
+	val1, val2, _ := extendedEucledian(pubExpDup, phiDup)
 
 	if val2.Cmp(big.NewInt(0)) == -1{
 		val2.Add(val2, phi)
 	}
 
-	fmt.Println("Private exponent is: ", val2)
-	privExp.Set(val2)	
+//	fmt.Println(val1,val3)
 
-	fmt.Println("PubExp*val2 = ", big.NewInt(0).Mul(pubExp, val2))
+//	fmt.Println("Private exponent is: ", val2)
 
-	pubWithVal2 := big.NewInt(0).Mul(pubExp, val2)
-	pubWithVal2.Mod(pubWithVal2, phi)
-	fmt.Println("Pub with Val2: ", pubWithVal2)
+	if val1.Cmp(big.NewInt(1)) == 0{
+		privExp.Set(val2)
+	}	
 
-	// File operations
+
+	// Write keys to respective files
 	
 	writePubKey(modulus, pubExp, os.Args[1])
 

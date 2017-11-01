@@ -72,9 +72,13 @@ func main(){
 		panic(readErr)
 	}
 	
+	//pubKeyStr := string(pubKeyByte[1: len(pubKeyByte)-1])
 	pubKeyStr := strings.Split(string(pubKeyByte), ",")
+
 	recoveredN := pubKeyStr[0]
+	recoveredN = recoveredN[1: len(recoveredN)]
 	recoveredE := pubKeyStr[1]
+	recoveredE = recoveredE[0: len(recoveredE)-1]
 
 	recoveredNInt := big.NewInt(0)
 	recoveredEInt := big.NewInt(0)

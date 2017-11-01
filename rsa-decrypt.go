@@ -73,7 +73,9 @@ func main(){
 	
 	privKeyStr := strings.Split(string(privKeyByte), ",")
 	recoveredN := privKeyStr[0]
+	recoveredN = recoveredN[1 : len(recoveredN)]
 	recoveredD := privKeyStr[1]
+//	recoveredD = recoveredD[1 : len(recoveredD)]
 	
 
 	recoveredNInt := big.NewInt(0)
